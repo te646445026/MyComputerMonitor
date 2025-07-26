@@ -1,0 +1,277 @@
+<Window x:Class="MyComputerMonitor.WPF.Views.GpuMonitorWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:ui="http://schemas.modernwpf.com/2019"
+        xmlns:oxy="http://oxyplot.org/wpf"
+        ui:WindowHelper.UseModernWindowStyle="True"
+        Title="GPU 监控"
+        Width="1200"
+        Height="800"
+        MinWidth="800"
+        MinHeight="600"
+        WindowStartupLocation="CenterScreen">
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        
+        <!-- 标题栏 -->
+        <Border Grid.Row="0" 
+                Background="{DynamicResource SystemControlBackgroundChromeMediumBrush}"
+                BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                BorderThickness="0,0,0,1">
+            <Grid Height="48">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                
+                <!-- 标题 -->
+                <StackPanel Grid.Column="0" 
+                           Orientation="Horizontal" 
+                           VerticalAlignment="Center"
+                           Margin="16,0">
+                    <TextBlock Text="🎮" 
+                              FontSize="20" 
+                              VerticalAlignment="Center"
+                              Margin="0,0,8,0"/>
+                    <TextBlock Text="GPU 监控" 
+                              FontSize="16" 
+                              FontWeight="SemiBold"
+                              VerticalAlignment="Center"/>
+                </StackPanel>
+                
+                <!-- 控制按钮 -->
+                <StackPanel Grid.Column="2" 
+                           Orientation="Horizontal"
+                           VerticalAlignment="Center"
+                           Margin="16,0">
+                    <Button Content="🔄" 
+                           Width="32" 
+                           Height="32"
+                           Margin="0,0,8,0"
+                           Click="RefreshButton_Click"
+                           ToolTip="刷新数据"/>
+                    <ComboBox x:Name="TimeRangeComboBox"
+                             Width="120"
+                             SelectedIndex="2"
+                             SelectionChanged="TimeRangeComboBox_SelectionChanged">
+                        <ComboBoxItem Content="最近 5 分钟"/>
+                        <ComboBoxItem Content="最近 15 分钟"/>
+                        <ComboBoxItem Content="最近 30 分钟"/>
+                        <ComboBoxItem Content="最近 1 小时"/>
+                        <ComboBoxItem Content="最近 2 小时"/>
+                    </ComboBox>
+                </StackPanel>
+            </Grid>
+        </Border>
+        
+        <!-- 主内容 -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <Grid Margin="16">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                
+                <!-- GPU 基本信息 -->
+                <Border Grid.Row="0" 
+                       Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
+                       BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}"
+                       BorderThickness="1"
+                       CornerRadius="8"
+                       Margin="0,0,0,16"
+                       Padding="16">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        
+                        <!-- 左侧信息 -->
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="GPU 信息"
+                                      FontSize="16"
+                                      FontWeight="SemiBold"
+                                      Margin="0,0,0,12"/>
+                            <TextBlock x:Name="GpuNameTextBlock" 
+                                      Text="名称: 获取中..."
+                                      FontSize="14"
+                                      Margin="0,0,0,4"/>
+                            <TextBlock x:Name="DriverVersionTextBlock" 
+                                      Text="驱动版本: 获取中..."
+                                      FontSize="14"
+                                      Margin="0,0,0,4"/>
+                            <TextBlock x:Name="VideoMemoryTextBlock" 
+                                      Text="显存: 获取中..."
+                                      FontSize="14"
+                                      Margin="0,0,0,4"/>
+                            <TextBlock x:Name="CoreClockTextBlock" 
+                                      Text="核心时钟: 获取中..."
+                                      FontSize="14"
+                                      Margin="0,0,0,4"/>
+                            <TextBlock x:Name="MemoryClockTextBlock" 
+                                      Text="显存时钟: 获取中..."
+                                      FontSize="14"
+                                      Margin="0,0,0,4"/>
+                        </StackPanel>
+                        
+                        <!-- 右侧信息 -->
+                        <StackPanel Grid.Column="1">
+                            <TextBlock Text="实时状态"
+                                      FontSize="16"
+                                      FontWeight="SemiBold"
+                                      Margin="0,0,0,12"/>
+                            <TextBlock x:Name="GpuUsageTextBlock" 
+                                      Text="GPU 使用率: 0%"
+                                      FontSize="14"
+                                      Margin="0,0,0,4"/>
+                            <TextBlock x:Name="MemoryUsageTextBlock" 
+                                      Text="显存使用率: 0%"
+                                      FontSize="14"
+                                      Margin="0,0,0,4"/>
+                            <TextBlock x:Name="TemperatureTextBlock" 
+                                      Text="温度: 0°C"
+                                      FontSize="14"
+                                      Margin="0,0,0,4"/>
+                            <TextBlock x:Name="PowerTextBlock" 
+                                      Text="功耗: 0W"
+                                      FontSize="14"
+                                      Margin="0,0,0,4"/>
+                            <TextBlock x:Name="FanSpeedTextBlock" 
+                                      Text="风扇转速: 0 RPM"
+                                      FontSize="14"
+                                      Margin="0,0,0,4"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+                
+                <!-- GPU 使用率历史图表 -->
+                <Border Grid.Row="1" 
+                       Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
+                       BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}"
+                       BorderThickness="1"
+                       CornerRadius="8"
+                       Margin="0,0,0,16"
+                       Padding="16">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        
+                        <TextBlock Grid.Row="0"
+                                  Text="GPU 使用率历史"
+                                  FontSize="16"
+                                  FontWeight="SemiBold"
+                                  Margin="0,0,0,12"/>
+                        
+                        <oxy:PlotView Grid.Row="1" 
+                                     x:Name="GpuUsagePlot"
+                                     Background="Transparent"
+                                     MinHeight="200"/>
+                    </Grid>
+                </Border>
+                
+                <!-- 显存使用率历史图表 -->
+                <Border Grid.Row="2" 
+                       Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
+                       BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}"
+                       BorderThickness="1"
+                       CornerRadius="8"
+                       Margin="0,0,0,16"
+                       Padding="16">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        
+                        <TextBlock Grid.Row="0"
+                                  Text="显存使用率历史"
+                                  FontSize="16"
+                                  FontWeight="SemiBold"
+                                  Margin="0,0,0,12"/>
+                        
+                        <oxy:PlotView Grid.Row="1" 
+                                     x:Name="MemoryUsagePlot"
+                                     Background="Transparent"
+                                     MinHeight="200"/>
+                    </Grid>
+                </Border>
+                
+                <!-- 温度历史图表 -->
+                <Border Grid.Row="3" 
+                       Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
+                       BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}"
+                       BorderThickness="1"
+                       CornerRadius="8"
+                       Margin="0,0,0,16"
+                       Padding="16">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        
+                        <TextBlock Grid.Row="0"
+                                  Text="温度历史"
+                                  FontSize="16"
+                                  FontWeight="SemiBold"
+                                  Margin="0,0,0,12"/>
+                        
+                        <oxy:PlotView Grid.Row="1" 
+                                     x:Name="TemperaturePlot"
+                                     Background="Transparent"
+                                     MinHeight="200"/>
+                    </Grid>
+                </Border>
+                
+                <!-- GPU 进程 -->
+                <Border Grid.Row="4" 
+                       Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
+                       BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}"
+                       BorderThickness="1"
+                       CornerRadius="8"
+                       Padding="16">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        
+                        <TextBlock Grid.Row="0"
+                                  Text="GPU 进程"
+                                  FontSize="16"
+                                  FontWeight="SemiBold"
+                                  Margin="0,0,0,12"/>
+                        
+                        <DataGrid Grid.Row="1" 
+                                 x:Name="GpuProcessesDataGrid" 
+                                 Height="200" 
+                                 AutoGenerateColumns="False"
+                                 CanUserAddRows="False" 
+                                 CanUserDeleteRows="False" 
+                                 IsReadOnly="True"
+                                 GridLinesVisibility="Horizontal" 
+                                 HeadersVisibility="Column">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="进程名" Binding="{Binding ProcessName}" Width="*"/>
+                                <DataGridTextColumn Header="PID" Binding="{Binding ProcessId}" Width="80"/>
+                                <DataGridTextColumn Header="GPU 使用率" Binding="{Binding GpuUsage}" Width="100"/>
+                                <DataGridTextColumn Header="显存使用" Binding="{Binding MemoryUsage}" Width="100"/>
+                                <DataGridTextColumn Header="引擎" Binding="{Binding Engine}" Width="80"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+                </Border>
+            </Grid>
+        </ScrollViewer>
+    </Grid>
+</Window>

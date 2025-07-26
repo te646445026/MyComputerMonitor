@@ -1,0 +1,290 @@
+<Window x:Class="MyComputerMonitor.WPF.Views.CpuMonitorWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:ui="http://schemas.modernwpf.com/2019"
+        xmlns:oxy="http://oxyplot.org/wpf"
+        ui:WindowHelper.UseModernWindowStyle="True"
+        Title="CPU 监控"
+        Width="900"
+        Height="700"
+        MinWidth="600"
+        MinHeight="500"
+        WindowStartupLocation="CenterScreen">
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        
+        <!-- 标题栏 -->
+        <Border Grid.Row="0" 
+                Background="{DynamicResource SystemControlBackgroundChromeMediumBrush}"
+                BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                BorderThickness="0,0,0,1">
+            <Grid Height="48">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                
+                <!-- 标题 -->
+                <StackPanel Grid.Column="0" 
+                           Orientation="Horizontal" 
+                           VerticalAlignment="Center"
+                           Margin="16,0">
+                    <TextBlock Text="🖥️" 
+                              FontSize="20" 
+                              VerticalAlignment="Center"
+                              Margin="0,0,8,0"/>
+                    <TextBlock Text="CPU 监控" 
+                              FontSize="16" 
+                              FontWeight="SemiBold"
+                              VerticalAlignment="Center"/>
+                </StackPanel>
+                
+                <!-- 刷新按钮 -->
+                <Button Grid.Column="2" 
+                       Content="🔄" 
+                       Width="32" 
+                       Height="32"
+                       Margin="16,0"
+                       Click="RefreshButton_Click"
+                       ToolTip="刷新数据"/>
+            </Grid>
+        </Border>
+        
+        <!-- 主内容 -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <Grid Margin="16">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                
+                <!-- CPU基本信息 -->
+                <Border Grid.Row="0" 
+                        Background="{StaticResource CardBackgroundBrush}"
+                        BorderBrush="{StaticResource BorderBrush}"
+                        BorderThickness="1"
+                        CornerRadius="8"
+                        Padding="16"
+                        Margin="0,0,0,16">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="处理器信息" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,12" Foreground="{StaticResource TextBrush}"/>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                
+                                <TextBlock Grid.Row="0" Grid.Column="0" Text="名称：" Margin="0,2" Foreground="{StaticResource SecondaryTextBrush}"/>
+                                <TextBlock Grid.Row="0" Grid.Column="1" x:Name="CpuNameTextBlock" Text="Intel Core i7-8700K" Margin="8,2,0,2" Foreground="{StaticResource TextBrush}"/>
+                                
+                                <TextBlock Grid.Row="1" Grid.Column="0" Text="核心数：" Margin="0,2" Foreground="{StaticResource SecondaryTextBrush}"/>
+                                <TextBlock Grid.Row="1" Grid.Column="1" x:Name="CpuCoresTextBlock" Text="6" Margin="8,2,0,2" Foreground="{StaticResource TextBrush}"/>
+                                
+                                <TextBlock Grid.Row="2" Grid.Column="0" Text="线程数：" Margin="0,2" Foreground="{StaticResource SecondaryTextBrush}"/>
+                                <TextBlock Grid.Row="2" Grid.Column="1" x:Name="CpuThreadsTextBlock" Text="12" Margin="8,2,0,2" Foreground="{StaticResource TextBrush}"/>
+                                
+                                <TextBlock Grid.Row="3" Grid.Column="0" Text="基础频率：" Margin="0,2" Foreground="{StaticResource SecondaryTextBrush}"/>
+                                <TextBlock Grid.Row="3" Grid.Column="1" x:Name="CpuBaseFrequencyTextBlock" Text="3.70 GHz" Margin="8,2,0,2" Foreground="{StaticResource TextBrush}"/>
+                                
+                                <TextBlock Grid.Row="4" Grid.Column="0" Text="当前频率：" Margin="0,2" Foreground="{StaticResource SecondaryTextBrush}"/>
+                                <TextBlock Grid.Row="4" Grid.Column="1" x:Name="CpuCurrentFrequencyTextBlock" Text="3.85 GHz" Margin="8,2,0,2" Foreground="{StaticResource TextBrush}"/>
+                            </Grid>
+                        </StackPanel>
+                        
+                        <StackPanel Grid.Column="1">
+                            <TextBlock Text="实时状态" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,12" Foreground="{StaticResource TextBrush}"/>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                
+                                <TextBlock Grid.Row="0" Grid.Column="0" Text="使用率：" Margin="0,2" Foreground="{StaticResource SecondaryTextBrush}"/>
+                                <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" Margin="8,2,0,2">
+                                    <TextBlock x:Name="CpuUsageTextBlock" Text="45%" Foreground="{StaticResource TextBrush}"/>
+                                    
+                                </StackPanel>
+                                
+                                <TextBlock Grid.Row="1" Grid.Column="0" Text="温度：" Margin="0,2" Foreground="{StaticResource SecondaryTextBrush}"/>
+                                <TextBlock Grid.Row="1" Grid.Column="1" x:Name="CpuTemperatureTextBlock" Text="65°C" Margin="8,2,0,2" Foreground="{StaticResource TextBrush}"/>
+                                
+                                <TextBlock Grid.Row="2" Grid.Column="0" Text="功耗：" Margin="0,2" Foreground="{StaticResource SecondaryTextBrush}"/>
+                                <TextBlock Grid.Row="2" Grid.Column="1" x:Name="CpuPowerTextBlock" Text="85W" Margin="8,2,0,2" Foreground="{StaticResource TextBrush}"/>
+                                
+                                <TextBlock Grid.Row="3" Grid.Column="0" Text="进程数：" Margin="0,2" Foreground="{StaticResource SecondaryTextBrush}"/>
+                                <TextBlock Grid.Row="3" Grid.Column="1" x:Name="ProcessCountTextBlock" Text="156" Margin="8,2,0,2" Foreground="{StaticResource TextBrush}"/>
+                            </Grid>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+                
+                <!-- 实时使用率显示 -->
+                <Border Grid.Row="1" 
+                       Background="{StaticResource CardBackgroundBrush}"
+                       BorderBrush="{StaticResource BorderBrush}"
+                       BorderThickness="1"
+                       CornerRadius="8"
+                       Margin="0,0,0,16"
+                       Padding="16">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        
+                        <TextBlock Grid.Row="0"
+                                  Text="CPU 使用率"
+                                  FontSize="16"
+                                  FontWeight="SemiBold"
+                                  Margin="0,0,0,12"
+                                  Foreground="{StaticResource TextBrush}"/>
+                        
+                        <Grid Grid.Row="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            
+                            <TextBlock Grid.Column="0"
+                                      Text="0%"
+                                      FontSize="12"
+                                      VerticalAlignment="Center"
+                                      Margin="0,0,8,0"
+                                      Foreground="{StaticResource SecondaryTextBrush}"/>
+                            
+                            <ProgressBar Grid.Column="1"
+                                        x:Name="CpuUsageProgressBarMain"
+                                        Height="20"
+                                        Minimum="0"
+                                        Maximum="100"
+                                        Value="0"
+                                        Background="{StaticResource BorderBrush}"
+                                        Foreground="{StaticResource PrimaryBrush}"/>
+                            
+                            <TextBlock Grid.Column="2"
+                                      Text="100%"
+                                      FontSize="12"
+                                      VerticalAlignment="Center"
+                                      Margin="8,0,0,0"
+                                      Foreground="{StaticResource SecondaryTextBrush}"/>
+                        </Grid>
+                    </Grid>
+                </Border>
+                
+                <!-- CPU使用率历史图表 -->
+                <Border Grid.Row="2" 
+                        Background="{StaticResource CardBackgroundBrush}"
+                        BorderBrush="{StaticResource BorderBrush}"
+                        BorderThickness="1"
+                        CornerRadius="8"
+                        Padding="16"
+                        Margin="0,0,0,16">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        
+                        <TextBlock Grid.Row="0" 
+                                   Text="CPU使用率历史" 
+                                   FontSize="16"
+                                   FontWeight="SemiBold"
+                                   Margin="0,0,0,12"
+                                   Foreground="{StaticResource TextBrush}"/>
+                        
+                        <oxy:PlotView Grid.Row="1" 
+                                      x:Name="CpuUsageChart"
+                                      Height="200"/>
+                    </Grid>
+                </Border>
+                
+                <!-- 核心详情 -->
+                <Border Grid.Row="3" 
+                       Background="{StaticResource CardBackgroundBrush}"
+                       BorderBrush="{StaticResource BorderBrush}"
+                       BorderThickness="1"
+                       CornerRadius="8"
+                       Padding="16">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        
+                        <TextBlock Grid.Row="0"
+                                  Text="核心详情"
+                                  FontSize="16"
+                                  FontWeight="SemiBold"
+                                  Margin="0,0,0,12"
+                                  Foreground="{StaticResource TextBrush}"/>
+                        
+                        <ItemsControl Grid.Row="1" x:Name="CpuCoresItemsControl">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <UniformGrid Columns="4"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Background="{StaticResource BackgroundBrush}"
+                                           BorderBrush="{StaticResource BorderBrush}"
+                                           BorderThickness="1"
+                                           CornerRadius="4"
+                                           Margin="4"
+                                           Padding="8">
+                                        <StackPanel>
+                                            <TextBlock Text="{Binding CoreName}"
+                                                      FontSize="12"
+                                                      FontWeight="SemiBold"
+                                                      HorizontalAlignment="Center"
+                                                      Margin="0,0,0,4"
+                                                      Foreground="{StaticResource TextBrush}"/>
+                                            <TextBlock Text="{Binding Usage, StringFormat={}{0:F1}%}"
+                                                      FontSize="14"
+                                                      HorizontalAlignment="Center"
+                                                      Margin="0,0,0,2"
+                                                      Foreground="{StaticResource TextBrush}"/>
+                                            <ProgressBar Value="{Binding Usage}"
+                                                        Height="6"
+                                                        Minimum="0"
+                                                        Maximum="100"
+                                                        Background="{StaticResource BorderBrush}"
+                                                        Foreground="{StaticResource PrimaryBrush}"/>
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </Grid>
+                </Border>
+            </Grid>
+        </ScrollViewer>
+    </Grid>
+</Window>
