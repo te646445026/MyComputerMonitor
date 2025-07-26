@@ -76,7 +76,7 @@ MyComputerMonitor/
 如有问题或建议，请通过以下方式联系：
 
 - 项目Issues: [GitHub Issues](https://github.com/username/MyComputerMonitor/issues)
-- 邮箱: your.email@example.com
+- 邮箱: 646445026@qq.com
 
 ## 更新日志
 
